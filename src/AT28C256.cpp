@@ -3,17 +3,14 @@
 #include "ShiftRegister.h"
 #include <Arduino.h>
 
-#define WE_BAR_PIN 10
-#define OE_BAR_PIN 11
-
-#define IO0_PIN 2
-#define IO7_PIN 9
+#define WE_BAR_PIN D3
+#define OE_BAR_PIN D4
 
 void SetArduinoPinMode(int mode);
 
 void SetupEEPROM()
 {
-    SetupShiftRegister();
+    SetupShiftRegisters();
 
     pinMode(WE_BAR_PIN, OUTPUT);
     pinMode(OE_BAR_PIN, OUTPUT);
@@ -28,7 +25,7 @@ void WriteEEPROM(uint8_t data, uint16_t address)
     // Make sure EEPROM is not outputting data
     digitalWrite(OE_BAR_PIN, HIGH);
 
-    WriteAddressToShiftRegister(address, false);
+    WriteAddressToShiftRegisters(address, false);
     SetArduinoPinMode(OUTPUT);
 
     for (int i = IO0_PIN; i <= IO7_PIN; i++)
@@ -51,14 +48,14 @@ void WriteEEPROM(uint8_t data, uint16_t address)
 bool WriteEEPROMPaged(uint8_t data[EEPROM_PAGE_SIZE], uint16_t startAddress)
 {
     // Check to see if startAddress starts at a page
-    if(startAddress % EEPROM_PAGE_SIZE != 0)
+    if (startAddress % EEPROM_PAGE_SIZE != 0)
         return false;
 
     Serial.print("Write-Paged...: ");
     // Make sure EEPROM is not outputting data
     digitalWrite(OE_BAR_PIN, HIGH);
-    
-    WriteAddressToShiftRegister(startAddress, false);
+
+    WriteAddressToShiftRegisters(startAddress, false);
     SetArduinoPinMode(OUTPUT);
 
     for (int i = 0; i < EEPROM_PAGE_SIZE; i++)
@@ -80,7 +77,7 @@ bool WriteEEPROMPaged(uint8_t data[EEPROM_PAGE_SIZE], uint16_t startAddress)
         delayMicroseconds(1);
 
         startAddress++;
-        WriteAddressToShiftRegister(startAddress, false);
+        WriteAddressToShiftRegisters(startAddress, false);
     }
 
     return true;
@@ -93,7 +90,7 @@ uint8_t ReadEEPROM(uint16_t address)
     digitalWrite(WE_BAR_PIN, HIGH);
 
     SetArduinoPinMode(INPUT);
-    WriteAddressToShiftRegister(address, true);
+    WriteAddressToShiftRegisters(address, true);
 
     digitalWrite(OE_BAR_PIN, LOW);
     delayMicroseconds(1);

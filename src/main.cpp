@@ -10,20 +10,27 @@ void setup()
 	SetupEEPROM();
 
 	Serial.begin(9600);
-
-	byte bytes[64];
-	for (int i = 0; i < 64; i++)
-	{
-		bytes[i] = i * 2;
-	}
+	while (!Serial)
+		;
 
 	delay(1000);
-	if (!WriteEEPROMPaged(bytes, 0))
-		Serial.println("Page write failed");
 
-	for (int i = 0; i < 64; i++)
+	for (uint32_t address = 0; address < 32768; address += EEPROM_PAGE_SIZE)
 	{
-		Serial.println(ReadEEPROM(i));
+		byte pageBytes[EEPROM_PAGE_SIZE];
+		memcpy_P(pageBytes, bytes + address, EEPROM_PAGE_SIZE);
+
+		if (!WriteEEPROMPaged(pageBytes, address))
+			Serial.println("Page write failed");
+
+		for (int i = address; i < address + EEPROM_PAGE_SIZE; i++)
+		{
+			Serial.print(ReadEEPROM(i));
+			Serial.print(" ");
+		}
+
+		Serial.println();
+		Serial.println();
 	}
 }
 
