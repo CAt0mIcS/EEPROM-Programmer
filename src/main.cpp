@@ -22,15 +22,6 @@ void setup()
 
 		if (!WriteEEPROMPaged(pageBytes, address))
 			Serial.println("Page write failed");
-
-		for (int i = address; i < address + EEPROM_PAGE_SIZE; i++)
-		{
-			Serial.print(ReadEEPROM(i));
-			Serial.print(" ");
-		}
-
-		Serial.println();
-		Serial.println();
 	}
 }
 

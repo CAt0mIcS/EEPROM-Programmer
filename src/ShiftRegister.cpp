@@ -1,7 +1,6 @@
 #include "ShiftRegister.h"
 #include <Arduino.h>
 
-
 #define SER_ADDR_PIN D0
 #define CLK_ADDR_PIN D5
 
@@ -9,7 +8,6 @@
 #define CLK_DATA_PIN D2
 
 void PulseClock(int clock);
-
 
 void SetupShiftRegisters()
 {
@@ -49,7 +47,6 @@ void WriteDataToShiftRegister(uint8_t data)
     // One more clock pulse to output latched data
     PulseClock(CLK_DATA_PIN);
 }
-
 
 void PulseClock(int clock)
 {

@@ -5,12 +5,16 @@ with open("src/Data.h", 'w'): pass
 
 with open("src/BinaryGenerator/rom.bin", 'rb') as reader:
     with open("src/Data.h", 'w') as writer:
+        writer.write("#ifndef DATA_H\n#define DATA_H\n")
+        writer.write("#include <Arduino.h>\n")
+
         byteStr = ""
         while (byte := reader.read(1)):
             byteStr += "0x" + byte.hex()
             byteStr += ", "
         
-        writer.write(f"const byte bytes[32768] PROGMEM = {{{byteStr}}};")
+        writer.write(f"const byte bytes[32768] PROGMEM = {{{byteStr}}};\n")
+        writer.write("#endif")
 
 
 os.system("C:/Users/Admin/.platformio/penv/Scripts/platformio.exe run --target upload")
