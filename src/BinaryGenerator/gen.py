@@ -1,4 +1,4 @@
-rom = ("0xea," * 32768)
+rom = bytearray([0xea] * 32768)
 
-with open("rom.txt", "w") as out_file:
+with open("src/BinaryGenerator/rom.bin", "wb") as out_file:
     out_file.write(rom)
