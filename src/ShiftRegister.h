@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 void SetupShiftRegisters();
-void WriteAddressToShiftRegisters(uint16_t address, bool outputEEPROMContentsOnDatabus);
+void WriteAddressToShiftRegisters(uint16_t address);
 void WriteDataToShiftRegister(uint8_t data);
 
 #endif

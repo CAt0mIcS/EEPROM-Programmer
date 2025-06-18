@@ -1,11 +1,11 @@
 #include "ShiftRegister.h"
 #include <Arduino.h>
 
-#define SER_ADDR_PIN D0
-#define CLK_ADDR_PIN D5
+#define SER_ADDR_PIN D1
+#define CLK_ADDR_PIN D2
 
-#define SER_DATA_PIN D1
-#define CLK_DATA_PIN D2
+#define SER_DATA_PIN D0
+#define CLK_DATA_PIN D5
 
 void PulseClock(int clock);
 
@@ -18,19 +18,15 @@ void SetupShiftRegisters()
     pinMode(CLK_DATA_PIN, OUTPUT);
 }
 
-void WriteAddressToShiftRegisters(uint16_t address, bool outputEEPROMContentsOnDatabus)
+void WriteAddressToShiftRegisters(uint16_t address)
 {
-    for (int i = 0; i < 15; ++i)
+    for (int i = 0; i < 16; ++i)
     {
         digitalWrite(SER_ADDR_PIN, address & 1);
         PulseClock(CLK_ADDR_PIN);
 
         address = address >> 1;
     }
-
-    // Use 16th bit of shift registers to control EEPROM's OE_BAR pin
-    digitalWrite(SER_ADDR_PIN, !outputEEPROMContentsOnDatabus);
-    PulseClock(CLK_ADDR_PIN);
 
     // One more clock pulse to output latched data
     PulseClock(CLK_ADDR_PIN);
@@ -42,6 +38,8 @@ void WriteDataToShiftRegister(uint8_t data)
     {
         digitalWrite(SER_DATA_PIN, data & 1);
         PulseClock(CLK_DATA_PIN);
+
+        data = data >> 1;
     }
 
     // One more clock pulse to output latched data

@@ -8,12 +8,7 @@
 void setup()
 {
 	SetupEEPROM();
-
 	Serial.begin(9600);
-	while (!Serial)
-		;
-
-	delay(1000);
 
 	for (uint32_t address = 0; address < 32768; address += EEPROM_PAGE_SIZE)
 	{
@@ -22,7 +17,15 @@ void setup()
 
 		if (!WriteEEPROMPaged(pageBytes, address))
 			Serial.println("Page write failed");
+
+		if (address % 320 == 0)
+		{
+			Serial.print(100 * (float(address) / 32768.f));
+			Serial.println("\% done");
+		}
 	}
+
+	Serial.println("Write done");
 }
 
 void loop()

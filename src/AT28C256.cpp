@@ -19,13 +19,11 @@ void SetupEEPROM()
 
 void WriteEEPROM(uint8_t data, uint16_t address)
 {
-    Serial.print("Write...: ");
     // Make sure EEPROM is not outputting data
     digitalWrite(OE_BAR_PIN, HIGH);
 
-    WriteAddressToShiftRegisters(address, false);
+    WriteAddressToShiftRegisters(address);
     WriteDataToShiftRegister(data);
-    Serial.println();
 
     // Initiate write cycle, address is latched at this point
     digitalWrite(WE_BAR_PIN, LOW);
@@ -42,16 +40,14 @@ bool WriteEEPROMPaged(uint8_t data[EEPROM_PAGE_SIZE], uint16_t startAddress)
     if (startAddress % EEPROM_PAGE_SIZE != 0)
         return false;
 
-    Serial.print("Write-Paged...: ");
     // Make sure EEPROM is not outputting data
     digitalWrite(OE_BAR_PIN, HIGH);
 
-    WriteAddressToShiftRegisters(startAddress, false);
+    WriteAddressToShiftRegisters(startAddress);
 
     for (int i = 0; i < EEPROM_PAGE_SIZE; i++)
     {
         WriteDataToShiftRegister(data[i]);
-        Serial.println();
 
         // Initiate write cycle, address is latched at this point
         digitalWrite(WE_BAR_PIN, LOW);
@@ -62,7 +58,7 @@ bool WriteEEPROMPaged(uint8_t data[EEPROM_PAGE_SIZE], uint16_t startAddress)
         delayMicroseconds(1);
 
         startAddress++;
-        WriteAddressToShiftRegisters(startAddress, false);
+        WriteAddressToShiftRegisters(startAddress);
     }
 
     return true;
