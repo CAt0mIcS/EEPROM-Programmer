@@ -1,11 +1,11 @@
 import os
 
-# Script to generate main.cpp file which uploads all data in asm/a.out to the EEPROM
+# Script to generate main.cpp file which uploads all data in build/a.out to the EEPROM
 
 # clear file
 with open("src/main.cpp", 'w'): pass
 
-with open("src/asm/a.out", 'rb') as reader:
+with open("build/a.out", 'rb') as reader:
     with open("src/main.cpp", 'w') as writer:
         writer.write("""
 #define EEPROM_AT28C256
