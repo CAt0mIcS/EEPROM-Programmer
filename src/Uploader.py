@@ -1,26 +1,53 @@
 import os
 
+# Script to generate main.cpp file which uploads all data in asm/a.out to the EEPROM
+
 # clear file
-with open("src/Data.h", 'w'): pass
+with open("src/main.cpp", 'w'): pass
 
-arrayLength : int = 16384
+with open("src/asm/a.out", 'rb') as reader:
+    with open("src/main.cpp", 'w') as writer:
+        writer.write("""
+#define EEPROM_AT28C256
 
-with open("src/BinaryGenerator/rom.bin", 'rb') as reader:
-    with open("src/Data.h", 'w') as writer:
-        writer.write("#ifndef DATA_H\n#define DATA_H\n")
-        writer.write(f"#define DATA_ARRAY_SIZE {arrayLength}\n")
-        writer.write("#include <Arduino.h>\n")
-
-        for i in range(0, int(32768 / arrayLength)):
-            byteStr = ""
-            for j in range(0, arrayLength):
-                byte = reader.read(1)
-                byteStr += "0x" + byte.hex()
-                byteStr += ", "
-            
-            writer.write(f"const byte bytes{i}[{arrayLength}] PROGMEM = {{{byteStr}}};\n")
+#include <Arduino.h>
+#include "EEPROMLibrary.h"
+                     
+void setup()
+{
+"""
+)
+        # read all bytes
+        byteList = reader.read()
         
-        writer.write("#endif")
+        # Remove any area where 0x00
+        step = 4
+        byteAddrMap : dict[str, str] = dict()
+        for i in range(0, len(byteList), step):
+            # Ignore padding 0x00
+            if byteList[i] == byteList[i + 1] == byteList[i + 2] == byteList[i + 3] == 0x00:
+                pass
+            else:
+                for j in range(i, i + step):
+                    byteAddrMap[hex(j)] = hex(byteList[j])
+        
+        for addr, byte in byteAddrMap.items():
+            writer.write(f"    WriteEEPROM({byte}, {addr});\n")
+        
+        writer.write("    delay(500);")
+        
+        for addr, byte in byteAddrMap.items():
+            writer.write(f"""
+    if(ReadEEPROM({addr}) != {byte})
+        Serial.println("Invalid byte written at {addr} (expected {byte})");
+""")
+
+        writer.write("""
+}
+void loop() 
+{
+}
+""")
 
 
 os.system("C:/Users/Admin/.platformio/penv/Scripts/platformio.exe run --target upload")

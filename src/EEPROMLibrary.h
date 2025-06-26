@@ -10,4 +10,6 @@ void WriteEEPROM(uint8_t data, uint16_t address);
 bool WriteEEPROMPaged(uint8_t data[EEPROM_PAGE_SIZE], uint16_t startAddress);
 uint8_t ReadEEPROM(uint16_t address);
 
+void WriteEEPROMWithDataShiftRegister(uint8_t data, uint16_t address);
+
 #endif

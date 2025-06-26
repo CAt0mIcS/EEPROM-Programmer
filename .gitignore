@@ -3,5 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-src/BinaryGenerator/rom.bin
 src/Data.h
+src/asm
+src/main.cpp
