@@ -16,7 +16,7 @@ void WriteAddressToShiftRegisters(uint16_t address)
 {
     for (int i = 0; i < 16; ++i)
     {
-        digitalWrite(SER_PIN, address & 1);
+        digitalWrite(SER_PIN, address & 0b00000001);
         PulseClock(CLK_PIN);
 
         address = address >> 1;

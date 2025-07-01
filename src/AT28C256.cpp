@@ -20,7 +20,7 @@ void SetupEEPROM()
     pinMode(OE_BAR_PIN, OUTPUT);
 
     digitalWrite(WE_BAR_PIN, HIGH);
-    digitalWrite(OE_BAR_PIN, LOW);
+    digitalWrite(OE_BAR_PIN, HIGH);
 }
 
 void WriteEEPROM(uint8_t data, uint16_t address)
@@ -34,6 +34,7 @@ void WriteEEPROM(uint8_t data, uint16_t address)
 
     SetDataPins(data);
     // Serial.println();
+    delayMicroseconds(1);
 
     // Initiate write cycle, address is latched at this point
     digitalWrite(WE_BAR_PIN, LOW);

@@ -15,6 +15,9 @@ with open("build/a.out", 'rb') as reader:
                      
 void setup()
 {
+    Serial.begin(9600);
+    SetupEEPROM();
+    delay(100);
 """
 )
         # read all bytes
@@ -33,16 +36,19 @@ void setup()
         
         for addr, byte in byteAddrMap.items():
             writer.write(f"    WriteEEPROM({byte}, {addr});\n")
+            writer.write("    delay(100);\n")
         
-        writer.write("    delay(500);")
+        writer.write("    delay(100);")
         
         for addr, byte in byteAddrMap.items():
             writer.write(f"""
-    if(ReadEEPROM({addr}) != {byte})
-        Serial.println("Invalid byte written at {addr} (expected {byte})");
+    if(ReadEEPROM({addr}) != {byte}) {{
+        Serial.print("Invalid byte written at {addr} (expected {byte} found ");
+        Serial.println(ReadEEPROM({addr}));
+        }}
 """)
 
-        writer.write("""
+        writer.write("""    Serial.println("Write done");\n
 }
 void loop() 
 {
