@@ -19,7 +19,7 @@ struct AddressDataPair
     uint16_t address;
 };
 
-const AddressDataPair byteData[] = {"""
+const AddressDataPair byteData[] PROGMEM = {"""
 )
         # read all bytes
         byteList = reader.read()
