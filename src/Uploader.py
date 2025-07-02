@@ -12,13 +12,14 @@ with open("build/a.out", 'rb') as reader:
 
 #include <Arduino.h>
 #include "EEPROMLibrary.h"
-                     
-void setup()
+
+struct AddressDataPair
 {
-    Serial.begin(9600);
-    SetupEEPROM();
-    delay(100);
-"""
+    uint8_t data;
+    uint16_t address;
+};
+
+const AddressDataPair byteData[] = {"""
 )
         # read all bytes
         byteList = reader.read()
@@ -35,17 +36,43 @@ void setup()
                     byteAddrMap[hex(j)] = hex(byteList[j])
         
         for addr, byte in byteAddrMap.items():
-            writer.write(f"    WriteEEPROM({byte}, {addr});\n")
-            writer.write("    delay(100);\n")
+            writer.write(f"{{ {byte}, {addr} }}, ")
+        
+        writer.write("};")
+
+        writer.write(f"""
+void setup()
+{{
+    Serial.begin(9600);
+    SetupEEPROM();
+    delay(100);
+    for(int i = 0; i < {len(byteAddrMap.items())}; i++)
+    {{
+        AddressDataPair dt;
+        memcpy_P(&dt, byteData + i, sizeof(AddressDataPair));
+        WriteEEPROM(dt.data, dt.address);
+        delay(10);
+    }}
+""")
         
         writer.write("    delay(100);")
-        
-        for addr, byte in byteAddrMap.items():
-            writer.write(f"""
-    if(ReadEEPROM({addr}) != {byte}) {{
-        Serial.print("Invalid byte written at {addr} (expected {byte} found ");
-        Serial.println(ReadEEPROM({addr}));
+
+        writer.write(f"""
+    for(int i = 0; i < {len(byteAddrMap.items())}; i++)
+    {{
+        AddressDataPair dt;
+        memcpy_P(&dt, byteData + i, sizeof(AddressDataPair));
+        uint8_t foundData = ReadEEPROM(dt.address);
+        if(foundData != dt.data)
+        {{
+            Serial.print("Invalid byte ");
+            Serial.print(foundData);
+            Serial.print(" written at ");
+            Serial.print(dt.address);
+            Serial.print(", expected ");
+            Serial.println(dt.data);
         }}
+    }}
 """)
 
         writer.write("""    Serial.println("Write done");\n
